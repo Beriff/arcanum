@@ -2,35 +2,47 @@ const page_width = document.documentElement.clientWidth;
 const page_height = document.documentElement.clientHeight;
 const origin = {x: page_width / 2, y: page_height / 2};
 
-const center_point = document.getElementById("center");
-let center_point_x = origin.x;
-let center_point_y = origin.y;
-const cpoff = 5;
-
-const x_axis = document.getElementById("x-axis");
 let x_axis_x = origin.x;
 let x_axis_y = origin.y;
 
-const y_axis = document.getElementById("y-axis");
 let y_axis_x = origin.x;
 let y_axis_y = origin.y;
 
-const coordinates = document.getElementById("coordinates");
+const c = document.getElementById("c");
 const dx = 100;
 const dy = 100;
 let adx = 20;
 let ady = 20;
 const adxc = 20;
 const adyc = 20;
-const coff = 2;
-const cc = 8;
+const coff = 2.5;
+
+const main_axis = document.getElementById("axis");
+const ctxa = main_axis.getContext("2d");
+
+const coor = document.getElementById("coordinates");
+const ctxc = coor.getContext("2d");
+
+const scale = window.devicePixelRatio;
+
+main_axis.width = main_axis.offsetWidth * scale;
+main_axis.height = main_axis.offsetHeight * scale;
+
+coor.width = coor.offsetWidth * scale;
+coor.height = coor.offsetHeight * scale;
+
+ctxa.scale(scale, scale);
+ctxc.scale(scale, scale);
+
+lineWidth(ctxa, 0.5);
+lineWidth(ctxc, 0.5);
+
+setInterval(tick, 100);
 
 function changePosition(e, x, y) {
     e.style.top = y + "px";
     e.style.left = x + "px";
 }
-
-setInterval(tick, 500);
 
 document.addEventListener("keydown", (e) => {
     const key = e.key;
@@ -40,127 +52,69 @@ document.addEventListener("keydown", (e) => {
 });
 
 function createCoordinates() {
-    coordinates.innerHTML = "";
+    c.innerHTML = "";
 
-    for(let i = 0; i < cc; i++) {
-        const cooru = document.createElement("div");
-        const coorr = document.createElement("div");
-        const coorl = document.createElement("div");
-        const coord = document.createElement("div");
+    for(let i = 0; i < 30; i++) {
+        const u = document.createElement("p");
+        const r = document.createElement("p");
+        const l = document.createElement("p");
+        const d = document.createElement("p");
 
-        const coorud = document.createElement("p");
-        const coorrd = document.createElement("p");
-        const coorld = document.createElement("p");
-        const coordd = document.createElement("p");
+        u.className = "coordinate-id";
+        r.className = "coordinate-id";
+        l.className = "coordinate-id";
+        d.className = "coordinate-id";
 
-        const axisu = document.createElement("div");
-        const axisd = document.createElement("div");
-        const axisr = document.createElement("div");
-        const axisl = document.createElement("div");
+        u.innerText = Math.round((dy * i / ady) * 100) / 100;
+        r.innerText = Math.round((dx * i / adx) * 100) / 100;
+        l.innerText = Math.round((dx * i / adx) * 100) / 100;
+        d.innerText = Math.round((dy * i / ady) * 100) / 100;
 
-        cooru.className = "coordinate";
-        coorr.className = "coordinate";
-        coorl.className = "coordinate";
-        coord.className = "coordinate";
-
-        coorud.className = "coordinate-id";
-        coorrd.className = "coordinate-id";
-        coorld.className = "coordinate-id";
-        coordd.className = "coordinate-id";
-
-        axisu.className = "axis-horizontal";
-        axisd.className = "axis-horizontal";
-        axisr.className = "axis-vertical";
-        axisl.className = "axis-vertical";
-
-        coorud.innerText = Math.round((dy * i / ady) * 100) / 100;
-        coorrd.innerText = Math.round((dx * i / adx) * 100) / 100;
-        coorld.innerText = Math.round((dx * i / adx) * 100) / 100;
-        coordd.innerText = Math.round((dy * i / ady) * 100) / 100;
-
-        changePosition(cooru, y_axis_x - coff, x_axis_y - i * dy);
-        changePosition(coorr, y_axis_x + i * dx, x_axis_y - coff);
-        changePosition(coorl, y_axis_x - i * dx, x_axis_y - coff);
-        changePosition(coord, y_axis_x - coff, x_axis_y + i * dy);
-
-        changePosition(coorud, y_axis_x - coff * 2, x_axis_y - i * dy - coff * 5);
-        changePosition(coorrd, y_axis_x + i * dx, x_axis_y - coff * 5);
-        changePosition(coorld, y_axis_x - i * dx, x_axis_y - coff * 5);
-        changePosition(coordd, y_axis_x - coff * 2, x_axis_y + i * dy - coff * 5);
-
-        changePosition(axisu, 0, x_axis_y - i * dy + coff);
-        changePosition(axisd, 0, x_axis_y + i * dy + coff);
-        changePosition(axisr, y_axis_x + i * dx + coff, 0);
-        changePosition(axisl, y_axis_x - i * dx + coff, 0);
+        changePosition(u, y_axis_x - coff * 2, x_axis_y - i * dy - coff * 5);
+        changePosition(r, y_axis_x + i * dx, x_axis_y - coff * 5);
+        changePosition(l, y_axis_x - i * dx, x_axis_y - coff * 5);
+        changePosition(d, y_axis_x - coff * 2, x_axis_y + i * dy - coff * 5);
 
         if(i !== 0) {
-            //coordinates.appendChild(cooru);
-            //coordinates.appendChild(coorr);
-            //coordinates.appendChild(coorl);
-            //coordinates.appendChild(coord);
+            strokeColor(ctxc, "black");
+            line(ctxc, 0, x_axis_y - i * dy, page_width, x_axis_y - i * dy);
+            line(ctxc, 0, x_axis_y + i * dy, page_width, x_axis_y + i * dy);
+            line(ctxc, y_axis_x + i * dx, 0, y_axis_x + i * dx, page_height);
+            line(ctxc, y_axis_x - i * dx, 0, y_axis_x - i * dx, page_height);
 
-            coordinates.appendChild(coorud);
-            coordinates.appendChild(coorrd);
-            coordinates.appendChild(coorld);
-            coordinates.appendChild(coordd);
-
-            coordinates.appendChild(axisu);
-            coordinates.appendChild(axisd);
-            coordinates.appendChild(axisr);
-            coordinates.appendChild(axisl);
-
-            for(let j = 0; j < cc; j++) {
-                const dur = document.createElement("div");
-                const ddr = document.createElement("div");
-                const dul = document.createElement("div");
-                const ddl = document.createElement("div");
-
-                dur.className = "coordinate";
-                ddr.className = "coordinate";
-                dul.className = "coordinate";
-                ddl.className = "coordinate";
-
-                changePosition(dur, y_axis_x + i * dx, x_axis_y - j * dy);
-                changePosition(ddr, y_axis_x + i * dx, x_axis_y + j * dy);
-                changePosition(dul, y_axis_x - i * dx, x_axis_y - j * dy);
-                changePosition(ddl, y_axis_x - i * dx, x_axis_y + j * dy);
-
-                if(j !== 0) {
-                    //coordinates.appendChild(dur);
-                    //coordinates.appendChild(ddr);
-                    //coordinates.appendChild(dul);
-                    //coordinates.appendChild(ddl);
-                }
-            }
+            c.appendChild(u);
+            c.appendChild(r);
+            c.appendChild(l);
+            c.appendChild(d);
         }
     }
 }
 
 function tick() {
-    //changePosition(center_point, center_point_x - cpoff, center_point_y - cpoff);
-    changePosition(x_axis, 0, x_axis_y);
-    changePosition(y_axis, y_axis_x, 0);
+    ctxa.clearRect(0, 0, main_axis.width, main_axis.height);
+    ctxc.clearRect(0, 0, coor.width, coor.height);
+
     createCoordinates();
+    
+    strokeColor(ctxa, "black");
+    line(ctxa, 0, x_axis_y, page_width, x_axis_y);
+    line(ctxa, y_axis_x, 0, y_axis_x, page_height);
 }
 
 function shift(key) {
     if(key === "ArrowRight") {
-        center_point_x-=15;
         x_axis_x-=15;
         y_axis_x-=15;
     }
     if(key === "ArrowLeft") {
-        center_point_x+=15;
         x_axis_x+=15;
         y_axis_x+=15;
     }
     if(key === "ArrowUp") {
-        center_point_y+=15;
         x_axis_y+=15;
         y_axis_y+=15;
     }
     if(key === "ArrowDown") {
-        center_point_y-=15;
         x_axis_y-=15;
         y_axis_y-=15;
     }
@@ -175,6 +129,4 @@ function zoom(key) {
         adx -= adxc;
         ady -= adyc;
     }
-
-    console.log(adx, ady);
 }
