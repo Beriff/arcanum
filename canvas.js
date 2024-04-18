@@ -26,3 +26,8 @@ function arc(ctx, x, y, r, sa, ea, d, s) {
 function lineWidth(ctx, n) {
     ctx.lineWidth = n;
 }
+
+function text(ctx, x, y, t, s) {
+    ctx.font = `${s}px serif`;
+    ctx.fillText(t, x, y);
+}
