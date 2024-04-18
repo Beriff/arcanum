@@ -54,39 +54,22 @@ document.addEventListener("keydown", (e) => {
 function createCoordinates() {
     c.innerHTML = "";
 
-    for(let i = 0; i < 30; i++) {
-        const u = document.createElement("p");
-        const r = document.createElement("p");
-        const l = document.createElement("p");
-        const d = document.createElement("p");
+    for(let i = 1; i < 10; i++) {
+        strokeColor(ctxc, "black");
+        line(ctxc, 0, x_axis_y - i * dy, page_width, x_axis_y - i * dy);
+        line(ctxc, 0, x_axis_y + i * dy, page_width, x_axis_y + i * dy);
+        line(ctxc, y_axis_x + i * dx, 0, y_axis_x + i * dx, page_height);
+        line(ctxc, y_axis_x - i * dx, 0, y_axis_x - i * dx, page_height);
 
-        u.className = "coordinate-id";
-        r.className = "coordinate-id";
-        l.className = "coordinate-id";
-        d.className = "coordinate-id";
+        let ver = Math.round((dy * i / ady) * 100) / 100; if(ver < 10) ver = ` ${ver}`;
+        let hor = Math.round((dx * i / adx) * 100) / 100; if(hor < 10) hor = ` ${hor}`;
+        const top = coff * 5;
+        const left = coff * 8;
 
-        u.innerText = Math.round((dy * i / ady) * 100) / 100;
-        r.innerText = Math.round((dx * i / adx) * 100) / 100;
-        l.innerText = Math.round((dx * i / adx) * 100) / 100;
-        d.innerText = Math.round((dy * i / ady) * 100) / 100;
-
-        changePosition(u, y_axis_x - coff * 2, x_axis_y - i * dy - coff * 5);
-        changePosition(r, y_axis_x + i * dx, x_axis_y - coff * 5);
-        changePosition(l, y_axis_x - i * dx, x_axis_y - coff * 5);
-        changePosition(d, y_axis_x - coff * 2, x_axis_y + i * dy - coff * 5);
-
-        if(i !== 0) {
-            strokeColor(ctxc, "black");
-            line(ctxc, 0, x_axis_y - i * dy, page_width, x_axis_y - i * dy);
-            line(ctxc, 0, x_axis_y + i * dy, page_width, x_axis_y + i * dy);
-            line(ctxc, y_axis_x + i * dx, 0, y_axis_x + i * dx, page_height);
-            line(ctxc, y_axis_x - i * dx, 0, y_axis_x - i * dx, page_height);
-
-            c.appendChild(u);
-            c.appendChild(r);
-            c.appendChild(l);
-            c.appendChild(d);
-        }
+        text(ctxc, y_axis_x - left, x_axis_y - i * dy - top + left * 1.3, ver, 15);
+        text(ctxc, y_axis_x + i * dx - left, x_axis_y + top, hor, 15);
+        text(ctxc, y_axis_x - i * dx - left, x_axis_y + top, hor, 15);
+        text(ctxc, y_axis_x - left, x_axis_y + i * dy - top + left * 1.3, ver, 15);
     }
 }
 
