@@ -58,10 +58,10 @@ function createCoordinates() {
         const top = coff * 5;
         const left = coff * 8;
 
-        text(ctxc, y_axis_x - left, x_axis_y - i * dy - top + left * 1.3, ver, 15);
-        text(ctxc, y_axis_x + i * dx - left, x_axis_y + top, hor, 15);
-        text(ctxc, y_axis_x - i * dx - left, x_axis_y + top, hor, 15);
-        text(ctxc, y_axis_x - left, x_axis_y + i * dy - top + left * 1.3, ver, 15);
+        text(ctxc, y_axis_x - left, x_axis_y - i * dy - top + left * 1.3, ver, 15, "OCR A");
+        text(ctxc, y_axis_x + i * dx - left, x_axis_y + top, hor, 15, "OCR A");
+        text(ctxc, y_axis_x - i * dx - left, x_axis_y + top, hor, 15, "OCR A");
+        text(ctxc, y_axis_x - left, x_axis_y + i * dy - top + left * 1.3, ver, 15, "OCR A");
     }
 }
 
