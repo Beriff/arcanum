@@ -81,6 +81,6 @@ function lex(input) {
     }
     
     return tokens;
-  }
-  
-  console.log(lex("2 * 2 + 4"));
+}
+
+console.log(lex("2 * 2 + 4"));
