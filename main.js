@@ -8,7 +8,6 @@ let x_axis_y = origin.y;
 let y_axis_x = origin.x;
 let y_axis_y = origin.y;
 
-const c = document.getElementById("c");
 const dx = 100;
 const dy = 100;
 let adx = 20;
@@ -34,15 +33,10 @@ coor.height = coor.offsetHeight * scale;
 ctxa.scale(scale, scale);
 ctxc.scale(scale, scale);
 
-lineWidth(ctxa, 0.5);
+lineWidth(ctxa, 1);
 lineWidth(ctxc, 0.5);
 
 setInterval(tick, 100);
-
-function changePosition(e, x, y) {
-    e.style.top = y + "px";
-    e.style.left = x + "px";
-}
 
 document.addEventListener("keydown", (e) => {
     const key = e.key;
@@ -52,8 +46,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 function createCoordinates() {
-    c.innerHTML = "";
-
     for(let i = 1; i < 10; i++) {
         strokeColor(ctxc, "black");
         line(ctxc, 0, x_axis_y - i * dy, page_width, x_axis_y - i * dy);
