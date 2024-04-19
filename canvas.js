@@ -27,7 +27,7 @@ function lineWidth(ctx, n) {
     ctx.lineWidth = n;
 }
 
-function text(ctx, x, y, t, s) {
-    ctx.font = `${s}px serif`;
+function text(ctx, x, y, t, s, f) {
+    ctx.font = `${s}px ${f}`;
     ctx.fillText(t, x, y);
 }
