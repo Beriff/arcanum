@@ -6,17 +6,36 @@ const token = (g, t, n) => {
         state: false
     };
 }
-const precedence = (g) => {
-    const p = {
-        "+": 1,
-        "-": 1,
-        "*": 2,
-        "/": 2,
-        "^": 3
-    }
+const precedence = g => {
+    const p = new Map();
+
+    p.set("=", 5);
+    p.set("+-", 10);
+    p.set("+", 10);
+    p.set("-", 10);
+    p.set("*", 20);
+    p.set("/", 20);
+    p.set("^", 30);
+
     const n = p[g];
     
-    return n === undefined ? 0 : n;
+    return p.has(g) ? p.get(g) : 0;
+}
+const branch2 = (v, t) => {
+    return {
+        value: v,
+        type: t,
+        left: { type: null },
+        right: { type: null }
+    };
+};
+const opt = {
+    "+": "cal",
+    "-": "cal",
+    "*": "cal",
+    "/": "cal",
+    "^": "cal",
+    "=": "one of its kind"
 }
 
 function lex(input) {
@@ -32,7 +51,7 @@ function lex(input) {
     const advance = (j, f) => {
         let total = "";
         
-        while(f(input[j])) {
+        while(f(input[j]) && j < input.length) {
             total = total + input[j];
             j++;
         }
@@ -81,7 +100,7 @@ function lex(input) {
         
         i++;
     }
-    
+
     return tokens;
 }
 
@@ -105,27 +124,33 @@ function parse(input) {
 
         return {
             value: g.value,
-            type: "operation",
+            type: g.type === "symbol" ? "operation" : g.type,
             left: l,
             right: r,
             state: true
-        }
+        };
     }
     const enclose = (g, n, e, b, f) => {
-        g[n] = branch(e, b, f);
-                
-        let d = false;
+        if(e.type === "symbol") {
+            g[n] = branch(e, b, f);
+                    
+            let d = false;
 
-        if(b !== undefined) {
-            input.splice(n - 1, 1);
-            d = true;
-        }
-        if(f !== undefined) {
-            if(!d) input.splice(n + 1, 1);
-            else input.splice(n, 1);
-        }
+            if(b !== undefined) {
+                input.splice(n - 1, 1);
+                d = true;
+            }
+            if(f !== undefined) {
+                if(!d) input.splice(n + 1, 1);
+                else input.splice(n, 1);
+            }
 
-        return n - 1;
+            return d ? n - 1 : n;
+        } else {
+            g[n] = branch(e, undefined, undefined);
+
+            return n;
+        }
     }
 
     let n = next(input);
@@ -135,7 +160,7 @@ function parse(input) {
         const bck = input[n - 1];
         const frw = input[n + 1];
 
-        if(e.type === "symbol") n = enclose(input, n, e, bck, frw);
+        n = enclose(input, n, e, bck, frw);
         
         input[n].state = true;
         n = next(input);
@@ -144,8 +169,49 @@ function parse(input) {
     return input;
 }
 
-function solve(equation, unknown, side) {
-    const otherSide = () => Math.abs(side - 1);
+function solve(equation, mem) {
+    let left = equation.left;
+    let right = equation.right;
+
+    if(left.type === "operation") left = solve(left, mem);
+    if(right.type === "operation") right = solve(right, mem);
+
+    equation.left = left;
+    equation.right = right;
+
+    if(equation.type === "operation") {
+        let lv = left.value;
+        let rv = right.value;
+
+        if(lv === undefined) lv = 0;
+        if(rv === undefined) rv = 0;
+
+        if(opt[equation.value] === "cal") {
+            if(left.type === "identifier") lv = mem[lv].value;
+            if(right.type === "identifier") rv = mem[rv].value;
+        }
+        if(opt[equation.value] === "one of its kind") {
+            if(right.type === "identifier") rv = mem[rv].value;
+        }
+
+        if(equation.value === "+") equation = branch2(lv + rv, "number");
+        if(equation.value === "-") equation = branch2(lv - rv, "number");
+        if(equation.value === "*") equation = branch2(lv * rv, "number");
+        if(equation.value === "/") equation = branch2(lv / rv, "number");
+        if(equation.value === "^") equation = branch2(lv ** rv, "number");
+        if(equation.value === "+-") equation = branch2([lv + rv, lv - rv,], "array");
+        //console.log(equation);
+        if(equation.value === "=") {
+            //console.log(equation, lv, rv);
+            mem[lv] = {
+                value: rv,
+                type: right.type
+            }
+            equation = right;
+        }
+    }
+
+    return equation;
 }
 
 function previewTree(tree) {
@@ -153,4 +219,14 @@ function previewTree(tree) {
     else console.log(tree);
 }
 
-console.log(parse(lex("2 * (3 + 5"))[0]);
+const equ = "y = x + 3";
+const mem = {
+    x: {
+        value: 1,
+        type: "number"
+    }
+};
+
+//console.log(parse(lex(equ))[0]);
+console.log(solve(parse(lex(equ))[0], mem));
+console.log(mem);
