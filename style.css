@@ -1,5 +1,6 @@
 body {
     overflow: hidden;
+    font-family: "OCR A";
 }
 
 #coordinates {
@@ -16,4 +17,11 @@ body {
     width: 2000px;
     height: 1000px;
     position: absolute;
+}
+
+#github {
+    position: absolute;
+    font-size: 30px;
+    right: 10px;
+    bottom: 10px;
 }
