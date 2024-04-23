@@ -1,9 +1,12 @@
-const page_width = document.documentElement.clientWidth;
-const page_height = document.documentElement.clientHeight;
-const origin = {x: page_width / 2, y: page_height / 2};
+let page_width = document.documentElement.clientWidth;
+let page_height = document.documentElement.clientHeight;
+let origin = {x: page_width / 2, y: page_height / 2};
 
 let x_axis_x = origin.x;
 let x_axis_y = origin.y;
+
+let fx = 0;
+let fy = 0;
 
 let y_axis_x = origin.x;
 let y_axis_y = origin.y;
@@ -12,8 +15,8 @@ const dx = 100;
 const dy = 100;
 let adx = 20;
 let ady = 20;
-const adxc = 20;
-const adyc = 20;
+const adxc = 2;
+const adyc = 2;
 const coff = 2.5;
 
 const main_axis = document.getElementById("axis");
@@ -97,11 +100,11 @@ function shift(key) {
 
 function zoom(key) {
     if(key === "1") {
-        adx += adxc;
-        ady += adyc;
+        adx /= adxc;
+        ady /= adyc;
     }
     if(key === "2") {
-        adx -= adxc;
-        ady -= adyc;
+        adx *= adxc;
+        ady *= adyc;
     }
 }
