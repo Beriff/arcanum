@@ -17,8 +17,6 @@ const precedence = g => {
     p.set("/", 20);
     p.set("^", 30);
 
-    const n = p[g];
-    
     return p.has(g) ? p.get(g) : 0;
 }
 const branch2 = (v, t) => {
