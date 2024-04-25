@@ -1,110 +1,91 @@
-let page_width = document.documentElement.clientWidth;
-let page_height = document.documentElement.clientHeight;
-let origin = {x: page_width / 2, y: page_height / 2};
+class Plot {
 
-let x_axis_x = origin.x;
-let x_axis_y = origin.y;
+    static ShiftCamera(plot, key) {
+        switch (key) {
+            case "ArrowRight":
+                plot.camera.x += 15; break;
+            case "ArrowLeft":
+                plot.camera.x -= 15; break;
+            case "ArrowUp":
+                plot.camera.y -= 15; break;
+            case "ArrowDown":
+                plot.camera.y += 15; break;
+        }
+    }
 
-let fx = 0;
-let fy = 0;
+    static ZoomCamera(plot, key) {
+        switch(key) {
+            case "1":
+                plot.coordinateSpacing.x += 5;
+                plot.coordinateSpacing.y += 5;
+            case "2":
+                plot.coordinateSpacing.x -= 5;
+                plot.coordinateSpacing.y -= 5;
+        }
+    }
 
-let y_axis_x = origin.x;
-let y_axis_y = origin.y;
+    Draw() {
+        // calculate how many coordinate lines would fit
+        let fit = {
+            x: 
+                Math.ceil(this.viewport.w / this.coordinateSpacing.x),
+            y:
+                Math.ceil(this.viewport.h / this.coordinateSpacing.y)
+        };
 
-const dx = 100;
-const dy = 100;
-let adx = 20;
-let ady = 20;
-const adxc = 2;
-const adyc = 2;
-const coff = 2.5;
+        let camera_center = {x: this.camera.x + this.viewport.w / 2, y: this.camera.y + this.viewport.h / 2}
 
-const main_axis = document.getElementById("axis");
-const ctxa = main_axis.getContext("2d");
 
-const coor = document.getElementById("coordinates");
-const ctxc = coor.getContext("2d");
+        // Draw horizontal lines
+        for(let x = 0; x < fit.x / 2; x++) {
+            let pos_x_front = camera_center.x + x * this.coordinateSpacing.x;
+            let pos_x_back = camera_center.x - x * this.coordinateSpacing.x;
 
-const scale = window.devicePixelRatio;
+            this.canvasDrawer.Line({x: pos_x_front, y: 0}, {x: pos_x_front, y: this.viewport.h});
+            this.canvasDrawer.Line({x: pos_x_back, y: 0}, {x: pos_x_back, y: this.viewport.h});
+        }
 
-main_axis.width = main_axis.offsetWidth * scale;
-main_axis.height = main_axis.offsetHeight * scale;
+        // Draw vertical lines
+        for(let y = 0; y < fit.y / 2; y++) {
+            let pos_y_top = camera_center.y + y * this.coordinateSpacing.y;
+            let pos_y_bottom = camera_center.y - y * this.coordinateSpacing.y;
 
-coor.width = coor.offsetWidth * scale;
-coor.height = coor.offsetHeight * scale;
+            this.canvasDrawer.Line({x: 0, y: pos_y_top}, {x: this.viewport.w, y: pos_y_top});
+            this.canvasDrawer.Line({x: 0, y: pos_y_bottom}, {x: this.viewport.w, y: pos_y_bottom});
+        }
+    }
 
-ctxa.scale(scale, scale);
-ctxc.scale(scale, scale);
+    constructor() {
+        // Canvas stuff
+        this.canvas = document.getElementById("axis");
+        this.canvasContext = this.canvas.getContext("2d");
+        this.canvasDrawer = new CanvasProxy(this.canvasContext);
 
-lineWidth(ctxa, 1);
-lineWidth(ctxc, 0.5);
+        //Viewport stuff
+        this.coordinateSpacing = {x: 50, y: 50};
+        this.viewport = {w: document.documentElement.clientWidth, h: document.documentElement.clientHeight};
+        this.camera = {x: 0, y: 0};
 
-setInterval(tick, 100);
+        this.canvas.width = this.viewport.w;
+        this.canvas.height = this.viewport.h;
 
-document.addEventListener("keydown", (e) => {
-    const key = e.key;
+        console.log(this.viewport)
 
-    shift(key);
-    zoom(key);
-});
+        //Probably shouldn't be initialized here
+        document.addEventListener("keydown", (e) => {
+            const key = e.key;
+        
+            this.ShiftCamera(this, key);
+            this.ZoomCamera(this, key);
+        });
 
-function createCoordinates() {
-    for(let i = 1; i < 10; i++) {
-        strokeColor(ctxc, "black");
-        line(ctxc, 0, x_axis_y - i * dy, page_width, x_axis_y - i * dy);
-        line(ctxc, 0, x_axis_y + i * dy, page_width, x_axis_y + i * dy);
-        line(ctxc, y_axis_x + i * dx, 0, y_axis_x + i * dx, page_height);
-        line(ctxc, y_axis_x - i * dx, 0, y_axis_x - i * dx, page_height);
+        setInterval(() => {
+            this.viewport = {w: document.documentElement.clientWidth, h: document.documentElement.clientHeight};
 
-        let ver = Math.round((dy * i / ady) * 100) / 100; if(ver < 10) ver = ` ${ver}`;
-        let hor = Math.round((dx * i / adx) * 100) / 100; if(hor < 10) hor = ` ${hor}`;
-        const top = coff * 5;
-        const left = coff * 8;
-
-        text(ctxc, y_axis_x - left, x_axis_y - i * dy - top + left * 1.3, ver, 15, "OCR A");
-        text(ctxc, y_axis_x + i * dx - left, x_axis_y + top, hor, 15, "OCR A");
-        text(ctxc, y_axis_x - i * dx - left, x_axis_y + top, hor, 15, "OCR A");
-        text(ctxc, y_axis_x - left, x_axis_y + i * dy - top + left * 1.3, ver, 15, "OCR A");
+            this.canvasContext.clearRect(0, 0, this.viewport.w, this.viewport.h);
+            this.Draw();
+        })
     }
 }
 
-function tick() {
-    ctxa.clearRect(0, 0, main_axis.width, main_axis.height);
-    ctxc.clearRect(0, 0, coor.width, coor.height);
-
-    createCoordinates();
-    
-    strokeColor(ctxa, "black");
-    line(ctxa, 0, x_axis_y, page_width, x_axis_y);
-    line(ctxa, y_axis_x, 0, y_axis_x, page_height);
-}
-
-function shift(key) {
-    if(key === "ArrowRight") {
-        x_axis_x-=15;
-        y_axis_x-=15;
-    }
-    if(key === "ArrowLeft") {
-        x_axis_x+=15;
-        y_axis_x+=15;
-    }
-    if(key === "ArrowUp") {
-        x_axis_y+=15;
-        y_axis_y+=15;
-    }
-    if(key === "ArrowDown") {
-        x_axis_y-=15;
-        y_axis_y-=15;
-    }
-}
-
-function zoom(key) {
-    if(key === "1") {
-        adx /= adxc;
-        ady /= adyc;
-    }
-    if(key === "2") {
-        adx *= adxc;
-        ady *= adyc;
-    }
-}
+let plot = new Plot();

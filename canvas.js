@@ -1,3 +1,24 @@
+class CanvasProxy {
+    Line(start, end, width = 0.5) {
+        this.context.strokeStyle = "gray"
+        this.context.lineWidth = width
+        
+        this.context.beginPath();
+        this.context.moveTo(start.x, start.y);
+        this.context.lineTo(end.x, end.y);
+        this.context.stroke()
+    }
+
+    Text(text, position, size) {
+        this.context.font = `${size}px OCR A`
+        this.context.fillText(text, position.x, position.y)
+    }
+
+    constructor(context) {
+        this.context = context;
+    }
+}
+
 function fillColor(ctx, c) {
     ctx.fillStyle = c;
 }
@@ -13,15 +34,6 @@ function line(ctx, sx, sy, ex, ey) {
     ctx.stroke();
 }
 
-function arc(ctx, x, y, r, sa, ea, d, s) {
-    ctx.beginPath();
-    ctx.arc(x, y, r, sa, ea, d);
-    if(s === "stroke") {
-        ctx.stroke();
-    } else if(s === "fill") {
-        ctx.fill();
-    }
-}
 
 function lineWidth(ctx, n) {
     ctx.lineWidth = n;
